@@ -6,7 +6,14 @@ from collections import Counter
 with open('linuxwords.txt') as f:
     words = [line.rstrip() for line in f]
 
+
 def search_words(s, soft):
+    """Checks whether string s is present in the word list.
+
+    Performs a binary search over the (sorted) list of words.
+    If soft is True, then s is considered a match if it is either an exact
+    match or a starting substring of a word.
+    """
     left = 0
     right = len(words) - 1
 
@@ -20,34 +27,45 @@ def search_words(s, soft):
             left = idx + 1
         else:
             right = idx - 1
-    
+
     return False
 
 
-def is_valid(s, terminal):
+def is_valid(s, terminal, maxwords):
+    """Checks whether an anagram string is valid."""
     if s == '':
         return True
 
+    if s.count(' ') + 1 > maxwords:
+        return False
+
+    # Since earlier substrings have already been checked and are presumably
+    # valid, only the last token or word in the string is searched in the word
+    # list.
     token = s.split()[-1]
     soft = not terminal and s[-1] != ' '
     return search_words(token, soft)
 
 
-def get_successors(state, maxwords=2):
-    if state['anagram'].count(' ') + 1 > maxwords:
-        return []
+def get_successors(state, maxwords):
+    """Traverses state graph to find valid anagrams."""
 
     terminal = len(state['chars']) == 0
-    if not is_valid(state['anagram'], terminal):
+
+    # Check whether the state is invalid and should be pruned
+    if not is_valid(state['anagram'], terminal, maxwords):
         return []
+
+    # If valid terminal state, stop search and return
     if terminal:
         return [state['anagram']]
-    
+
+    # Continue to recursively explore subsequent states
     next_states = []
 
     for c in state['chars']:
         chars = state['chars'].copy()
-        chars.subtract({c:1})
+        chars.subtract({c: 1})
         if chars[c] == 0:
             del chars[c]
         next_states.append({
@@ -69,9 +87,20 @@ def get_successors(state, maxwords=2):
     return anagrams
 
 
+def find_anagrams(source, maxwords=2):
+    """Returns a list of anagrams based on input string."""
+    chars = Counter(source.lower().replace(' ', ''))
+
+    state = {
+        'anagram': '',
+        'chars': chars,
+    }
+
+    return get_successors(state, maxwords)
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('Usage: word [maxwords]')
+        print('Usage: text [maxwords]')
         sys.exit()
 
     source = sys.argv[1]
@@ -80,14 +109,7 @@ if __name__ == '__main__':
     else:
         maxwords = 2
 
-    chars = Counter(source.lower().replace(' ', ''))
+    anagrams = find_anagrams(source, maxwords=maxwords)
 
-    state = {
-        'anagram': '',
-        'chars': chars,
-    }
-
-    anagrams = get_successors(state, maxwords=maxwords)
     for a in anagrams:
         print(a)
-
