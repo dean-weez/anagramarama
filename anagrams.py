@@ -88,7 +88,10 @@ def get_successors(state, maxwords):
 
 
 def find_anagrams(source, maxwords=2):
-    """Returns a list of anagrams based on input string."""
+    """Returns a list of anagrams based on input string.
+
+    Deduplicates multiple orderings of the same set of words.
+    """
     chars = Counter(source.lower().replace(' ', ''))
 
     state = {
@@ -96,7 +99,10 @@ def find_anagrams(source, maxwords=2):
         'chars': chars,
     }
 
-    return get_successors(state, maxwords)
+    anagrams = get_successors(state, maxwords)
+    uniq = set([' '.join(sorted(words.split())) for words in anagrams])
+    return sorted(list(uniq))
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
