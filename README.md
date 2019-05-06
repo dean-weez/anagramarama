@@ -14,7 +14,3 @@ Note that the runtime _rapidly_ increases with the length of the input and max w
 ## How it works
 
 Instead of checking the full n! permutations of the input, the script constructs a state graph of anagram string and remaining letters and searches the graph for valid anagrams, pruning branches as it goes if an invalid state is encoutered (if the start of an anagram string doesn't match the start of a known word, then any longer anagram string will also not match).
-
-## TODO
-
-As the graph search fans out, each branch is traversed independently; as such, this is an ideal problem for parallelization. Running on multiple threads would decrease runtime for longer input strings.
