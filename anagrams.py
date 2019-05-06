@@ -33,18 +33,24 @@ def search_words(s, soft):
 
 def is_valid(s, terminal, maxwords):
     """Checks whether an anagram string is valid."""
+    # Base state (empty string) is valid
     if s == '':
         return True
 
+    # Check number of word breaks vs maxwords
     if s.count(' ') + 1 > maxwords:
+        return False
+
+    # Deduplicate word orderings by only exploring words in sorted order
+    words = s.split()
+    if words != sorted(words):
         return False
 
     # Since earlier substrings have already been checked and are presumably
     # valid, only the last token or word in the string is searched in the word
     # list.
-    token = s.split()[-1]
     soft = not terminal and s[-1] != ' '
-    return search_words(token, soft)
+    return search_words(words[-1], soft)
 
 
 def get_successors(state, maxwords):
@@ -100,8 +106,8 @@ def find_anagrams(source, maxwords=2):
     }
 
     anagrams = get_successors(state, maxwords)
-    uniq = set([' '.join(sorted(words.split())) for words in anagrams])
-    return sorted(list(uniq))
+    anagrams.sort()
+    return anagrams
 
 
 if __name__ == '__main__':
