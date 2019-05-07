@@ -1,4 +1,5 @@
 import sys
+import bisect
 from collections import Counter
 
 # Words list taken from https://users.cs.duke.edu/~ola/ap/linuxwords
@@ -14,20 +15,13 @@ def search_words(s, soft):
     If soft is True, then s is considered a match if it is either an exact
     match or a starting substring of a word.
     """
-    left = 0
-    right = len(words) - 1
-
-    while left <= right:
-        idx = (right + left) // 2
-        if words[idx] == s:
-            return True
-        if soft and words[idx].startswith(s):
-            return True
-        if s > words[idx]:
-            left = idx + 1
-        else:
-            right = idx - 1
-
+    idx = bisect.bisect_left(words, s)
+    if idx == len(words):
+        return False
+    if words[idx] == s:
+        return True
+    if soft and words[idx].startswith(s):
+        return True
     return False
 
 
