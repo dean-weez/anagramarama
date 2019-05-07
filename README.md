@@ -14,9 +14,3 @@ Note that the runtime _rapidly_ increases with the length of the input and max w
 ## How it works
 
 Instead of checking the full n! permutations of the input, the script constructs a state graph of anagram string and remaining letters and searches the graph for valid anagrams, pruning branches as it goes if an invalid state is encoutered (if the start of an anagram string doesn't match the start of a known word, then any longer anagram string will also not match).
-
-## TODO
-
-If a string S has an anagram consisting of multiple words, then all orderings of those words will also be anagrams of S. This means that outputs may have near-duplicate results of the form "A B" and "B A". The script output could be made more parsimonious by only returning unique _sets_ of words.
-
-As the graph search fans out, each branch is traversed independently; as such, this is an ideal problem for parallelization. Running on multiple threads would decrease runtime for longer input strings.
